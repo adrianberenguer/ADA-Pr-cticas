@@ -465,3 +465,41 @@ correlation matrix of the fit parameters:
 a               1.000 
 b              -1.000  1.000 
 c               0.842 -0.851  1.000 
+
+
+*******************************************************************************
+Thu Feb 17 16:55:28 2022
+
+
+FIT:    data read from "quickSort.CPUtimes" using 1:2
+        format = x:z
+        #datapoints = 6
+        residuals are weighted equally (unit weight)
+
+function used for fitting: y(x)
+	y(x)=a*x*log(x) + b*x + c
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 3.1413306648e+14   0.00e+00  3.90e+06    1.000000e+00   1.000000e+00   1.000000e+00
+  10 1.0369703313e-01  -5.90e-02  3.90e-04    3.995504e-06   2.469942e-05  -1.324120e-01
+
+After 10 iterations the fit converged.
+final sum of squares of residuals : 0.103697
+rel. change during last iteration : -5.89503e-07
+
+degrees of freedom    (FIT_NDF)                        : 3
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.185918
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.0345657
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 3.9955e-06       +/- 6.216e-07    (15.56%)
+b               = 2.46994e-05      +/- 8.709e-06    (35.26%)
+c               = -0.132412        +/- 0.1958       (147.9%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -1.000  1.000 
+c               0.842 -0.851  1.000 

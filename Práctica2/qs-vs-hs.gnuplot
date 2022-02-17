@@ -1,20 +1,21 @@
 #Adrián Berenguer Agulló, 74445262N
 set terminal png
+
 set output "quickSort.png"
 
-set xlabel "Array size"
+set xlabel "size of arrays"
 set ylabel "Average CPU time (ms)"
 
-set title  "Quick Sort: Empirical Analysis of Average Time Complexity"
+set title  "Quicksort"
 
-plot "quickSort.CPUtimes" using 1:2 with lines title "CPU Times of sample"
+plot "quickSort.CPUtimes" using 1:2 with lines title "random arrays", "sorted arrays", "reverse-sorted arrays" 
 
 
 ##########################################################################
 #Testing different analytical functions to determine which best fits:
 
-set output "quickSort_and_Fit-Function.png"
-set title "Quick Sort: Average time complexity and Fit function"
+#set output "quickSort_and_Fit-Function.png"
+#set title "Quick Sort: Average time complexity and Fit function"
 
 
 #------------------------------------------------------------------------
@@ -29,9 +30,9 @@ set title "Quick Sort: Average time complexity and Fit function"
 
 
 ##Fit to a (n log n + n) function: 
-y(x)=a*x*log(x) + b*x + c
-fitFunction="Fitting quicksort time values to f(n) = n log(n)+n"
-fit y(x) "quickSort.CPUtimes" using 1:2 via a,b,c
+#y(x)=a*x*log(x) + b*x + c
+#fitFunction="Fitting quicksort time values to f(n) = n log(n)+n"
+#fit y(x) "quickSort.CPUtimes" using 1:2 via a,b,c
 
 
 ##Fit to a cuadratic function: 
@@ -43,6 +44,6 @@ fit y(x) "quickSort.CPUtimes" using 1:2 via a,b,c
 
 
 #Finally draw both functions (CPU times of sample and the one that best fits) on one graph
-plot "quickSort.CPUtimes" using 1:2 with lines title "CPU times of sample", y(x) title fitFunction  
+#plot "quickSort.CPUtimes" using 1:2 with lines title "CPU times of sample", y(x) title fitFunction  
 
 
