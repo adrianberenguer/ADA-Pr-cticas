@@ -9,8 +9,8 @@ Práctica 2:"Empirical analysis by means of program-steps account of two sorting
 
 using namespace std;
 
-float PASOSHS = 0.0;
-float PASOSQS = 0.0;
+long PASOSHS = 0;
+long PASOSQS = 0;
 
 //--------------------------------------------------------------
 // Middle Quick Sort
@@ -18,18 +18,22 @@ void
 middle_QuickSort(int * v, long left, long right){
     long i,j;
     int pivot;
-    PASOSQS++; //
 	if (left<right){
 		i=left; j=right;
 		pivot=v[(i+j)/2];
-        PASOSQS++; //
 		do{
-			while (v[i]<pivot) i++;
-			while (v[j]>pivot) j--;
+			while (v[j]>pivot) {
+                j--;
+                PASOSQS++;  
+            }
+			while (v[i]<pivot) {
+                i++; 
+                PASOSQS++;
+            }
 			if (i<=j){ 
 				swap(v[i], v[j]);
 				i++; j--;
-                PASOSQS++; //
+                PASOSQS++;
 			}
 		}while (i<=j);
 		if (left < j)  middle_QuickSort(v,left,j);
@@ -48,20 +52,19 @@ void sink(int *v, size_t n, size_t i)
     size_t l, r; //left and right child
 
     do{
+        PASOSHS++; //
+
         largest = i;  // Initialize largest as root
         l = 2*i + 1;  // left = 2*i + 1
         r = 2*i + 2;  // right = 2*i + 2
-        PASOSHS++; //
         // Is left child larger than root?
         if (l < n && v[l] > v[largest]) {
             largest = l; 
-            PASOSHS++; //
         }
     
         // Is right child larger than largest so far
         if (r < n && v[r] > v[largest]) {
             largest = r; 
-            PASOSHS++; //
         }
     
         // If largest is still root then the process is done
@@ -80,7 +83,7 @@ void heapSort(int *v, size_t n)
 {
     // Build a MAX-HEAP with the input array
     for (size_t i = n / 2 - 1; i >= 0; i--){
-        sink(v, n, i); PASOSHS++; //
+        sink(v, n, i);
         if (i==0) break; //as size_t is unsigned type
 	}
 
@@ -88,7 +91,6 @@ void heapSort(int *v, size_t n)
     // One by swap the first element, which is the largest (max-heap), with the last element of the vector and rebuild heap by sinking the new placed element on the begin of vector.  
     for (size_t i=n-1; i>0; i--)
     {
-        PASOSHS++; //
 		// Move current root to the end.
         swap(v[0], v[i]);
  		// Now largest element is at the end but do not know if the element just moved to the beginning is well placed, so a sink process is required.
@@ -112,65 +114,60 @@ main(void) {
         size_t size = size_t( pow(2,exp) );
         int* v1 = new int [size];
         int* v2 = new int [size];
-        int* v3 = new int [size];
 
-        if (!v1 || !v2 || !v3){
+        if (!v1){
             cerr << "Error, not enough memory!" << endl;
             exit (EXIT_FAILURE);  
         }
 
         cout << "    " << size << "     " << std::flush;
 
+        PASOSHS = 0;
+        PASOSQS = 0;
+
         //Random Arrays
         for(size_t x = 0; x < 30; x++) {
             for (size_t j = 0; j < size; j++) {
-                v1[j] = rand(); 
+                v1[j] = v2[j] = rand(); 
             }        
             middle_QuickSort(v1, 0, size);
-            heapSort(v1, size);
-        }
-        cout  << PASOSQS / 1000000 / 30 << "   ";
-        cout  << PASOSHS / 1000000 / 30 << "   ";
-
-        PASOSHS = 0.0;
-        PASOSQS = 0.0;
-
-        //Sorted Arrays
-        for(size_t y = 0; y < 30; y++) {
-            for(size_t i = 0; i < size - 1; i++) {
-                v2[i] = i;
-            }
-            middle_QuickSort(v2, 0, size);
             heapSort(v2, size);
         }
-        cout  << PASOSQS / 1000000 / 30 << "   ";
-        cout  << PASOSHS / 1000000 / 30 << "   ";
+        cout  << (float)PASOSQS / 1000000 / 30 << "   ";
+        cout  << (float)PASOSHS / 1000000 / 30 << "   ";
 
-        PASOSHS = 0.0;
-        PASOSQS = 0.0;
+        PASOSHS = 0;
+        PASOSQS = 0;
+
+        //Sorted Arrays
+        
+        middle_QuickSort(v1, 0, size);
+        heapSort(v2, size);
+        
+        cout  << (float)PASOSQS / 1000000 << "   ";
+        cout  << (float)PASOSHS / 1000000 << "   ";
+
+        PASOSHS = 0;
+        PASOSQS = 0;
 
         //Reverse Sorted Arrays
-        for(size_t z = 0; z < 30; z++) {
-            for(size_t k = size; k > 0; k--) {
-                v2[k] = k;
-            }
-            middle_QuickSort(v3, 0, size);
-            heapSort(v3, size);
+        for(size_t z = 0; z < size / 2; z++) {
+            swap(v1[z], v1[size-z-1]);
+            swap(v2[z], v2[size-z-1]);
         }
-        cout  << PASOSQS / 1000000 / 30 << "   ";
-        cout  << PASOSHS / 1000000 / 30 << endl;
 
-        PASOSHS = 0.0;
-        PASOSQS = 0.0;
+        middle_QuickSort(v1, 0, size);
+        heapSort(v2, size);
+        
+        cout  << (float)PASOSQS / 1000000 << "   ";
+        cout  << (float)PASOSHS / 1000000 << endl;
+
+        PASOSHS = 0;
+        PASOSQS = 0;
 
         delete[] v1;
         delete[] v2;
-        delete[] v3;
     }
     //DUDAS:
-    //Hay que dividir entre 1000000
-    //hay que hacer 30 de average?
-    //donnde poner pasos?
-    //pq me da todo el rato mismo resultado?
     //como hacer gnuplot
 }
