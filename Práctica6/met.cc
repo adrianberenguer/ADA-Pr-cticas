@@ -7,6 +7,7 @@
 #include <stdlib.h> 
 #include <cstring> 
 #include <string.h>
+#include <limits>
 
 using namespace std;
 
@@ -92,27 +93,69 @@ bool compruebaArgs(int argc, char *argv[], string &inputFile, bool &ignoraSinAlm
     return true;
 }
 
-// Recursivo sin almacén(versión ingenua)
-double met_naive(int n, int m, vector<double> &capacidades, vector<double> &distancias) {
+vector<int> puertas;
 
-    return 0;
+double ogw(int k, int n, vector<double> &capacidades, vector<double> &distancias) {
+    double result = 0.0;//numeric_limits<int>::max();
+    double resultGood = numeric_limits<int>::max();
+    int puerta;
+
+    for (int i = k; i < n; i++)
+    {
+        result = 0.0;
+        for(int j = k; j < n; j++) 
+        {
+            if(j != i) {
+                result += capacidades[j] * abs(distancias[j] - distancias[i]);
+            }
+            //cout <<"entra"<<endl;  
+        }
+        cout <<result <<endl;
+        if(result < resultGood) { 
+            resultGood = result;
+            puerta = i;
+        }
+        
+    }
+    puertas.push_back(puerta);
+    //cout <<resultGood<<endl;
+    return resultGood;    
+}
+
+// Recursivo sin almacén(versión ingenua)
+double met_naive(int m, int n, vector<double> &capacidades, vector<double> &distancias) {
+    double result = numeric_limits<int>::max();
+    
+    if(m == n) {
+        result = 0.0;
+    }
+    else if(m == 1) {
+        result =  ogw(0, n, capacidades, distancias);
+    }
+    else {
+        for(int k = m-1; k < n-1; k++) {
+            result = min(result, ogw(k, n, capacidades, distancias) + met_naive(m-1, k, capacidades, distancias));
+        }
+    }
+
+    return result;
 }
 
 // Recursivo con almacén
-double met_memo(int n, int m, vector<double> &capacidades, vector<double> &distancias) {
+double met_memo(int m, int n, vector<double> &capacidades, vector<double> &distancias) {
 
     return 0;
 }
 
 // Iterativo con almacén que hace uso de una tabla para 
 // almacenar resultados intermedios
-double met_it_matrix(int n, int m, vector<double> &capacidades, vector<double> &distancias) {
+double met_it_matrix(int m, int n, vector<double> &capacidades, vector<double> &distancias) {
 
     return 0;
 }
 
 // Iterativo con almacén con complejidad espacial mejorada
-double met_it_vector(int n, int m, vector<double> &capacidades, vector<double> &distancias) {
+double met_it_vector(int m, int n, vector<double> &capacidades, vector<double> &distancias) {
 
     return 0;
 }
@@ -140,10 +183,32 @@ int main(int argc, char *argv[]) {
             return 0;
         }
 
-        
+        double result = met_naive(m, n, capacidades, distancias);
+        cout <<result<<endl;
 
     }
-
-
     return 0;
 }
+
+/*for(int i=0; i<capacidades.size(); i++) {
+        cout <<capacidades[i]<<" ";
+    }
+    cout <<endl;
+    
+    0,2,3,6
+    */
+       /*for (int i = k; i < n-1; i++)
+    {
+        result = 0.0;
+        for(int j = i+1; j < n; j++) 
+        {
+            //cout <<"entra"<<endl;
+            result += capacidades[j] * abs(distancias[j] - distancias[i]);  
+        }   
+        cout <<result <<endl;
+        if(result < resultGood) { 
+            resultGood = result;
+            puerta = i;
+        }
+        
+    }*/
