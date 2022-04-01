@@ -11,6 +11,8 @@
 
 using namespace std;
 
+const int CENTINELA = -1;
+
 // Leer el fichero de entrada y guardar sus valores
 bool leerFichero(string inputFile, int &n, int &m, vector<double> &capacidades, vector<double> &distancias) {
     //n m
@@ -107,10 +109,8 @@ double ogw(int k, int n, vector<double> &capacidades, vector<double> &distancias
         {
             if(j != i) {
                 result += capacidades[j] * abs(distancias[j] - distancias[i]);
-            }
-            //cout <<"entra"<<endl;  
+            } 
         }
-        cout <<result <<endl;
         if(result < resultGood) { 
             resultGood = result;
             puerta = i;
@@ -118,7 +118,6 @@ double ogw(int k, int n, vector<double> &capacidades, vector<double> &distancias
         
     }
     puertas.push_back(puerta);
-    //cout <<resultGood<<endl;
     return resultGood;    
 }
 
@@ -133,7 +132,7 @@ double met_naive(int m, int n, vector<double> &capacidades, vector<double> &dist
         result =  ogw(0, n, capacidades, distancias);
     }
     else {
-        for(int k = m-1; k < n-1; k++) {
+        for(int k = m-1; k <= n-1; k++) {
             result = min(result, ogw(k, n, capacidades, distancias) + met_naive(m-1, k, capacidades, distancias));
         }
     }
@@ -142,9 +141,22 @@ double met_naive(int m, int n, vector<double> &capacidades, vector<double> &dist
 }
 
 // Recursivo con almacén
-double met_memo(int m, int n, vector<double> &capacidades, vector<double> &distancias) {
+double met_memo(int m, int n, vector<double> &capacidades, vector<double> &distancias, vector<vector<double>> &matriz) {
+    double result = numeric_limits<int>::max();
 
-    return 0;
+    if(matriz[m][n] != CENTINELA) {
+        return matriz[m][n];
+    }
+    if(m == 0) {
+        return matriz[0][0] = 0.0;
+    }
+    else {
+        for(int k = m-1; k <= n-1; k++) {
+            result = min(result, ogw(k, n, capacidades, distancias) + met_memo(m-1, k, capacidades, distancias, matriz));
+        }
+    }
+
+    return matriz[m][n] = result;
 }
 
 // Iterativo con almacén que hace uso de una tabla para 
@@ -183,8 +195,40 @@ int main(int argc, char *argv[]) {
             return 0;
         }
 
-        double result = met_naive(m, n, capacidades, distancias);
-        cout <<result<<endl;
+        if(ignoraSinAlmIng) {
+            double result = met_naive(m, n, capacidades, distancias);
+            cout <<result <<" ";
+        }
+        else {
+            cout <<"- ";
+        }
+
+        vector<vector<double>> matrizMemo(m+1, vector<double>(n+1, -1));
+
+        double result2 = met_memo(m, n, capacidades, distancias, matrizMemo);
+        cout <<result2 <<" ";
+
+        cout << "? ?"<<endl;
+        cout << "?" <<endl;
+        cout <<"?" <<endl;
+
+        if(tablas) {
+            cout <<"Memoizaton matrix: "<<endl;
+            /*for(int i=0; i<m; i++) {
+                for(int j=0; j<n; j++) {
+                    if(matrizMemo[i][j] == -1) {
+                        cout <<"- "
+                    }
+                    else {
+                        cout <<matrizMemo[i][j]<<" ";
+                    }
+                }
+                cout <<endl;
+            }*/
+
+            cout <<"Iterative matrix: "<<endl;
+            cout <<"?"<<endl;
+        }
 
     }
     return 0;
