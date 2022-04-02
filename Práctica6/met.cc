@@ -151,7 +151,7 @@ double met_memo(int m, int n, vector<double> &capacidades, vector<double> &dista
         return matriz[0][0] = 0.0;
     }
     else if(m == 1) {
-        result =  ogw(0, n, capacidades, distancias);
+        result = ogw(0, n, capacidades, distancias);
     }
     else {
         for(int k = m-1; k <= n-1; k++) {
@@ -164,9 +164,20 @@ double met_memo(int m, int n, vector<double> &capacidades, vector<double> &dista
 
 // Iterativo con almacén que hace uso de una tabla para 
 // almacenar resultados intermedios
-double met_it_matrix(int m, int n, vector<double> &capacidades, vector<double> &distancias) {
+double met_it_matrix(int m, int n, vector<double> &capacidades, vector<double> &distancias, vector<vector<double>> &matriz) {
+    
+    
+    matriz[0][0] = 0.0;
+    
+    for(int k = 1; k <= m; k++) {
+        double result = numeric_limits<int>::max();
+        for(int i = 1; i <= n; i++) { 
+            result = min(result, ogw(k, n, capacidades, distancias) + matriz[k-1][n-i]);
+        }
+        matriz[k][n] = result;
+    }
 
-    return 0;
+    return matriz[m][n];
 }
 
 // Iterativo con almacén con complejidad espacial mejorada
@@ -211,12 +222,16 @@ int main(int argc, char *argv[]) {
         double result2 = met_memo(m, n, capacidades, distancias, matrizMemo);
         cout <<result2 <<" ";
 
-        cout << "? ?"<<endl;
+        vector<vector<double>> matrizIter(m+1, vector<double>(n+1, -1));
+
+        double result3 = met_it_matrix(m, n, capacidades, distancias, matrizIter);
+        cout <<result3<<" ";
+        cout << "?"<<endl;
         cout << "?" <<endl;
         cout <<"?" <<endl;
 
         if(tablas) {
-            cout <<"Memoizaton matrix: "<<endl;
+            cout <<"Memoizaton matrix:"<<endl;
             for(int i=1; i<m+1; i++) {
                 for(int j=1; j<n+1; j++) {
                     if(matrizMemo[i][j] == -1) {
@@ -229,8 +244,18 @@ int main(int argc, char *argv[]) {
                 cout <<endl;
             }
 
-            cout <<"Iterative matrix: "<<endl;
-            cout <<"?"<<endl;
+            cout <<"Iterative matrix:"<<endl;
+            for(int i=1; i<m+1; i++) {
+                for(int j=1; j<n+1; j++) {
+                    if(matrizIter[i][j] == -1) {
+                        cout <<"- ";
+                    }
+                    else {
+                        cout <<matrizIter[i][j]<<" ";
+                    }
+                }
+                cout <<endl;
+            }
         }
 
     }
