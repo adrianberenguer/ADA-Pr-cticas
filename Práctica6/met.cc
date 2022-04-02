@@ -147,8 +147,11 @@ double met_memo(int m, int n, vector<double> &capacidades, vector<double> &dista
     if(matriz[m][n] != CENTINELA) {
         return matriz[m][n];
     }
-    if(m == 0) {
+    else if(m == 0) {
         return matriz[0][0] = 0.0;
+    }
+    else if(m == 1) {
+        result =  ogw(0, n, capacidades, distancias);
     }
     else {
         for(int k = m-1; k <= n-1; k++) {
@@ -214,17 +217,17 @@ int main(int argc, char *argv[]) {
 
         if(tablas) {
             cout <<"Memoizaton matrix: "<<endl;
-            /*for(int i=0; i<m; i++) {
-                for(int j=0; j<n; j++) {
+            for(int i=1; i<m+1; i++) {
+                for(int j=1; j<n+1; j++) {
                     if(matrizMemo[i][j] == -1) {
-                        cout <<"- "
+                        cout <<"- ";
                     }
                     else {
                         cout <<matrizMemo[i][j]<<" ";
                     }
                 }
                 cout <<endl;
-            }*/
+            }
 
             cout <<"Iterative matrix: "<<endl;
             cout <<"?"<<endl;
