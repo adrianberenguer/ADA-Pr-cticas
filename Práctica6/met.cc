@@ -95,12 +95,9 @@ bool compruebaArgs(int argc, char *argv[], string &inputFile, bool &ignoraSinAlm
     return true;
 }
 
-vector<int> puertas;
-
 double ogw(int k, int n, vector<double> &capacidades, vector<double> &distancias) {
     double result = 0.0;//numeric_limits<int>::max();
     double resultGood = numeric_limits<int>::max();
-    int puerta;
 
     for (int i = k; i < n; i++)
     {
@@ -113,11 +110,10 @@ double ogw(int k, int n, vector<double> &capacidades, vector<double> &distancias
         }
         if(result < resultGood) { 
             resultGood = result;
-            puerta = i;
         }
         
     }
-    puertas.push_back(puerta);
+
     return resultGood;    
 }
 
@@ -165,30 +161,47 @@ double met_memo(int m, int n, vector<double> &capacidades, vector<double> &dista
 // Iterativo con almacén que hace uso de una tabla para 
 // almacenar resultados intermedios
 double met_it_matrix(int m, int n, vector<double> &capacidades, vector<double> &distancias, vector<vector<double>> &matriz) {
-    
-    
-    matriz[0][0] = 0.0;
-    
-    for(int k = 1; k <= m; k++) {
-        double result = numeric_limits<int>::max();
-        for(int i = 1; i <= n; i++) { 
-            result = min(result, ogw(k, n, capacidades, distancias) + matriz[k-1][n-i]);
+    double result = 0.0;
+
+    //matriz[0][0] = 0.0;
+    for(int x = 1; x < n+1; x++) {
+        matriz[1][x] = ogw(0, x, capacidades, distancias);
+    }
+
+    for(int k = 2; k <= m; k++) {
+        for(int i = k-1; i <= n; i++) {
+            result = matriz[k-1][i-1];
+            result = min(result, ogw(k, n, capacidades, distancias) - ogw(0, k-1, capacidades, distancias));//matriz[1][k-2]);
+            matriz[k][i] = result;    
         }
-        matriz[k][n] = result;
     }
 
     return matriz[m][n];
 }
 
 // Iterativo con almacén con complejidad espacial mejorada
-double met_it_vector(int m, int n, vector<double> &capacidades, vector<double> &distancias) {
+double met_it_vector(int m, int n, vector<double> &capacidades, vector<double> &distancias, vector<vector<double>> &matriz) {
+    matriz[1][1] = 0.0;
+    
+    for(int l = 1; l <= m; l++) {
+        double result = numeric_limits<int>::max();
+        for(int k = 1; k <= n; k++) {
+            result = min(result, ogw(k, n, capacidades, distancias) + matriz[l][k]);
+            matriz[l][k] = result;
+        }
+        
+    }
 
-    return 0;
+    return matriz[m][n];
 }
 
 // Tabla de encaminamiento
-void met_parser() {
-
+void met_parser(int m, int n, vector<double> &capacidades, vector<double> &distancias, vector<vector<double>> &matriz, vector<int> &tabla) {
+    
+    for(int i = m-1; i >= 0; i--) {
+        //double s1 = matriz[i][n];
+        //double s2 = numeric_limits<double>::max();
+    }
 }
 
 // Main
@@ -221,6 +234,9 @@ int main(int argc, char *argv[]) {
 
         double result2 = met_memo(m, n, capacidades, distancias, matrizMemo);
         cout <<result2 <<" ";
+
+        vector<int> tabla_encaminamiento(n);
+        met_parser(m, n, capacidades, distancias, matrizMemo, tabla_encaminamiento);
 
         vector<vector<double>> matrizIter(m+1, vector<double>(n+1, -1));
 
