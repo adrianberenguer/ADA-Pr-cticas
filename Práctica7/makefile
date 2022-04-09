@@ -2,11 +2,11 @@
 	
 OPTS = -Wall -O3 -std=c++0x
 
-potter: potter-greedy.cc
-	g++ ${OPTS} -o potter-greedy potter-greedy.cc
+met_greedy: met_greedy.cc
+	g++ ${OPTS} -o met_greedy met_greedy.cc
 
-tar: potter-greedy.cc makefile
-	tar cvfz 74445262N.tar.gz potter-greedy.cc makefile
+tar: met_greedy.cc makefile
+	tar cvfz 74445262N.tar.gz met_greedy.cc makefile
 
 clean:
-	-rm potter-greedy
+	-rm met_greedy
