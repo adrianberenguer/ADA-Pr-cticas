@@ -95,6 +95,7 @@ bool compruebaArgs(int argc, char *argv[], string &inputFile, bool &ignoraSinAlm
     return true;
 }
 
+// Ogw calcula el mínimo tráfico de poner una puerta en las pociciones k a n
 double ogw(int k, int n, vector<double> &capacidades, vector<double> &distancias) {
     double result = 0.0;//numeric_limits<int>::max();
     double resultGood = numeric_limits<int>::max();
@@ -145,7 +146,7 @@ double met_naive(int m, int n, vector<double> &capacidades, vector<double> &dist
 // Recursivo con almacén
 double met_memo(int m, int n, vector<double> &capacidades, vector<double> &distancias, vector<vector<double>> &matriz) {
     double result = numeric_limits<int>::max();
-
+    
     if(matriz[m][n] != CENTINELA) {
         return matriz[m][n];
     }
@@ -193,14 +194,14 @@ double met_it_vector(int m, int n, vector<double> &capacidades, vector<double> &
     vector<double> filas(m+1);
     vector<double> columnas(n+1);
 
-    for(int i=0; i<=n; i++) {
+    for(int i=0; i<n+1; i++) {
         filas[i] = ogw(0, i, capacidades, distancias);
     }
 
-    for(int i = 2; i <= m; i++) {
-        for(int j = 1; j <= n; j++) {
+    for(int i = 2; i < m+1; i++) {
+        for(int j = 1; j < n+1; j++) {
             double result = numeric_limits<double>::max();
-            for(int k = i-1; k <= j-1; k++) {
+            for(int k = i-1; k < j; k++) {
                 result = min(result, ogw(k, j, capacidades, distancias) + filas[k]);
             }
             if(result != numeric_limits<double>::max()) {
@@ -215,15 +216,15 @@ double met_it_vector(int m, int n, vector<double> &capacidades, vector<double> &
 
 // Tabla de encaminamiento
 void met_parser(int m, int n, vector<double> &capacidades, vector<double> &distancias, vector<vector<double>> &matriz, vector<int> &tabla) {
-    double result = numeric_limits<double>::max();
+    //double result = numeric_limits<double>::max();
 
-    for(int i = m; i > 0; i--) {
-        for(int j = n; j > 0; j++) {
-            for(int k = 0; k < n; k++) {
-                result = min(result, ogw())
-            }
-        }
-    }
+    //for(int i = m; i > 0; i--) {
+    //    for(int j = n; j > 0; j++) {
+    //        for(int k = 0; k < n; k++) {
+    //            result = min(result, ogw())
+    //        }
+    //    }
+    //}
 }
 
 // Main
@@ -269,7 +270,7 @@ int main(int argc, char *argv[]) {
         cout <<result4<<endl;
 
         cout <<"?"<<endl;
-        cout <<"?"<<endl;
+        cout <<result4<<endl;
 
         if(tablas) {
             cout <<"Memoizaton matrix:"<<endl;
@@ -298,30 +299,7 @@ int main(int argc, char *argv[]) {
                 cout <<endl;
             }
         }
-
     }
+
     return 0;
 }
-
-/*for(int i=0; i<capacidades.size(); i++) {
-        cout <<capacidades[i]<<" ";
-    }
-    cout <<endl;
-    
-    0,2,3,6
-    */
-       /*for (int i = k; i < n-1; i++)
-    {
-        result = 0.0;
-        for(int j = i+1; j < n; j++) 
-        {
-            //cout <<"entra"<<endl;
-            result += capacidades[j] * abs(distancias[j] - distancias[i]);  
-        }   
-        cout <<result <<endl;
-        if(result < resultGood) { 
-            resultGood = result;
-            puerta = i;
-        }
-        
-    }*/
