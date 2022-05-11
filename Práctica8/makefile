@@ -2,11 +2,11 @@
 	
 OPTS = -Wall -O3 -std=c++0x
 
-potter: potter_bt.cc
-	g++ ${OPTS} -o potter_bt potter_bt.cc
+met_bt: met_bt.cc
+	g++ ${OPTS} -o met_bt met_bt.cc
 
-tar: potter_bt.cc makefile
-	tar cvfz 74445262N.tar.gz potter_bt.cc makefile
+tar: met_bt.cc makefile
+	tar cvfz 74445262N.tar.gz met_bt.cc makefile
 
 clean:
-	-rm potter_bt
+	-rm met_bt
