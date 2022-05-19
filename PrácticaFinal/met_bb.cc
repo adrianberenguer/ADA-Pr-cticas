@@ -125,6 +125,7 @@ int visitados = 0, explorados = 0, hoja = 0, no_factibles = 0, no_prometedores =
 prometedores_descartados = 0, mejor_actualizada_hoja = 0, mejor_actualizada_no_hoja = 0;
 vector<int> tablaFinal;
 vector<int> tablaGreedy;
+double best_val;
 
 //colocar una puerta en cada nodo e ir quitando las que hagan que aumente menos el tráfico
 double met_greedy_2(int m, int n, vector<double> &capacidades, vector<vector<double>> &caminos) {
@@ -194,56 +195,60 @@ double cota_optimista(int m, int n, vector<double> capacidades, vector<vector<do
     return result;
 }
 
-double met_bb(int m, int n, vector<double> capacidades, vector<vector<double> > caminos, 
-vector<int> puertas, double indice, double best_val, int cont) {
-    using Sol = vector<short>;
-    using Node = tuple<double, Sol, int>;
-    Sol vec(puertas.size());
+double met_bb(int m, int n, vector<double> capacidades, vector<vector<double> > caminos) {
+    typedef vector<int> Sol;
+    typedef tuple<Sol, int, int, double> Node;
+    Sol vec(capacidades.size());
     priority_queue<Node> pq;
     Node nodo;
-    double ind, value, cota;
-    cota = cota_optimista(m, n, capacidades, caminos, puertas, ind);
-    best_val = met_greedy_2(m, n, capacidades, caminos);
-    puertas = tablaGreedy;
+    double ind, cota;
+    int contador;
+    best_val = met_greedy_2(m, n, capacidades, caminos); //Cota pesimista
     
-    pq.emplace(numeric_limits<double>::max(), Sol(puertas.size()), 0);
+    pq.emplace( Sol(capacidades.size()), 0, 0, numeric_limits<double>::max());
 
     while( !pq.empty() ) {
         nodo = pq.top();
-        value = get<0>(nodo);
-        vec = get<1>(nodo);
-        ind = get<2>(nodo);
+        vec = get<0>(nodo);
+        ind = get<1>(nodo);
+        contador = get<2>(nodo);
+        cota = get<3>(nodo);
         pq.pop();
 
-        if(ind == puertas.size()) { //Nodos hoja
+        if(best_val < cota) { //Prometedores pero descartados
+            prometedores_descartados++;
+        }
+
+        if(ind == capacidades.size()) { //Nodos hoja
             hoja++;
-            double bestnew = tablaBuena(m, n, capacidades, caminos, puertas);
-            if(bestnew < best_val) {
+            double bestnew = tablaBuena(m, n, capacidades, caminos, vec);
+            if(bestnew < best_val) { //Mejor solución se actualiza a partir de un nodo completado
+                mejor_actualizada_hoja++;
                 best_val = bestnew;
-                tablaFinal = puertas;
+                tablaFinal = vec;
             }
             continue ;
         }
 
-        if(ind >= n - m && m - cont == n - ind) { //Mejora -> Si quedan x nodos por explorar y x puertas, coloco puertas en los que faltan y termino
-            for(unsigned x = ind; x < puertas.size(); x++) {
+        if(ind >= n - m && m - contador == n - ind) { //Mejora -> Si quedan x nodos por explorar y x puertas, coloco puertas en los que faltan y termino
+            for(unsigned x = ind; x < capacidades.size(); x++) {
                 vec[x] = 1;
             }
-            double aux = tablaBuena(m, n, capacidades, caminos, puertas);
+            double aux = tablaBuena(m, n, capacidades, caminos, vec);
             if(aux < best_val) {
                 best_val = aux;
-                tablaFinal = puertas;
+                tablaFinal = vec;
             }
             continue ;
         }
-        if(cont == m) { //Mejora -> si ya tengo m puertas colocadas, pongo 0 en el resto y se acabó
-            for(unsigned x = ind; x < puertas.size(); x++) {
+        if(contador == m) { //Mejora -> si ya tengo m puertas colocadas, pongo 0 en el resto y se acabó
+            for(unsigned x = ind; x < capacidades.size(); x++) {
                 vec[x] = 0;
             }
-            double aux = tablaBuena(m, n, capacidades, caminos, puertas);
+            double aux = tablaBuena(m, n, capacidades, caminos, vec);
             if(aux < best_val) {
                 best_val = aux;
-                tablaFinal = puertas;
+                tablaFinal = vec;
             }
             continue ;
         }
@@ -253,14 +258,13 @@ vector<int> puertas, double indice, double best_val, int cont) {
             vec[ind] = i;
             
             if(i == 1) { 
-                cont++; //Número de puertas colocadas
+                contador++; //Número de puertas colocadas
             }
-            if(cont <= m) { //Nodos explorados
+            if(contador <= m) { //Nodos explorados
                 explorados++;
-                double newBest = cota_optimista(m, n, capacidades, caminos, puertas, ind);
+                double newBest = cota_optimista(m, n, capacidades, caminos, vec, ind);
                 if(newBest < best_val) {
-                    //met_bb(m,n,capacidades,caminos,puertas, ind+1, best_val, cont);
-                    pq.emplace(newBest, vec, ind+1);
+                    pq.emplace( vec, ind+1, contador, newBest);
                 }
                 else { //Descartados por no prometedores
                     no_prometedores++;
@@ -293,13 +297,10 @@ int main(int argc, char *argv[]) {
             return 0;
         }
 
-        vector<int> puertas(n, 0);
         long double time;
-        double best_val = numeric_limits<double>::max();
-        double indice = 0;
 
         auto start = clock();
-            double result = met_bb(m, n, capacidades, caminos, puertas, indice, best_val, 0);
+            double result = met_bb(m, n, capacidades, caminos);
         auto end = clock();
 
         //Mostrar resultados
